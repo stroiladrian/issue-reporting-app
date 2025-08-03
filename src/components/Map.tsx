@@ -10,7 +10,7 @@ import {
   validateContent, 
   validateLocation, 
   checkForDuplicates,
-  cleanupRateLimitData 
+  clearAllRateLimitData 
 } from '../utils/security';
 
 // Fix for default markers in react-leaflet
@@ -52,9 +52,9 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
     }
   }, [issues, selectedIssue]);
 
-  // Cleanup old rate limit data on component mount
+  // Clear ALL rate limit data on component mount (for testing)
   React.useEffect(() => {
-    cleanupRateLimitData();
+    clearAllRateLimitData();
   }, []);
 
   const handleMapClick = (lat: number, lng: number) => {

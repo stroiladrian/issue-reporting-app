@@ -46,7 +46,7 @@ const SecurityInfo: React.FC = () => {
               <span className="icon">🖼️</span>
               <div>
                 <strong>Image Validation</strong>
-                <p>Max 2MB, verified file types (JPEG, PNG, WebP)</p>
+                <p>Max 10MB, verified file types (JPEG, PNG, WebP)</p>
               </div>
             </div>
             

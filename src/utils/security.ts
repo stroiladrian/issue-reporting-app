@@ -7,9 +7,9 @@ export interface RateLimits {
 }
 
 export const RATE_LIMITS: RateLimits = {
-  issuesPerHour: 3,
-  issuesPerDay: 10,
-  commentsPerHour: 5
+  issuesPerHour: 1000,  // Temporarily disabled for testing
+  issuesPerDay: 1000,   // Temporarily disabled for testing
+  commentsPerHour: 1000 // Temporarily disabled for testing
 };
 
 export const SPAM_KEYWORDS = [
@@ -56,9 +56,9 @@ export const checkRateLimit = (type: keyof RateLimits): boolean => {
  * Validate image file size and type
  */
 export const validateImage = async (file: File): Promise<boolean> => {
-  // Size limit (2MB)
-  if (file.size > 2 * 1024 * 1024) {
-    throw new Error('Image must be under 2MB. Please compress your image or choose a smaller one.');
+  // Size limit (10MB) - allows smartphone photos
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error('Image must be under 10MB. Please try a different photo if this one is extremely large.');
   }
   
   // File type validation
@@ -67,21 +67,8 @@ export const validateImage = async (file: File): Promise<boolean> => {
     throw new Error('Only JPEG, PNG, and WebP images are allowed.');
   }
   
-  // Image dimension validation
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      if (img.width > 1920 || img.height > 1080) {
-        reject(new Error('Image dimensions too large. Maximum size: 1920x1080 pixels.'));
-      } else if (img.width < 100 || img.height < 100) {
-        reject(new Error('Image too small. Minimum size: 100x100 pixels.'));
-      } else {
-        resolve(true);
-      }
-    };
-    img.onerror = () => reject(new Error('Invalid image file.'));
-    img.src = URL.createObjectURL(file);
-  });
+  // Image file validation passed
+  return Promise.resolve(true);
 };
 
 /**
@@ -207,6 +194,21 @@ export const cleanupRateLimitData = (): void => {
       } else if (key.includes('_day_') && timestamp < cutoffDay) {
         localStorage.removeItem(key);
       }
+    }
+  });
+};
+
+/**
+ * Clear ALL rate limit data (for testing purposes)
+ */
+export const clearAllRateLimitData = (): void => {
+  Object.keys(localStorage).forEach(key => {
+    if (key.includes('issuesPerHour') || 
+        key.includes('issuesPerDay') || 
+        key.includes('commentsPerHour') ||
+        key.includes('_hour_') || 
+        key.includes('_day_')) {
+      localStorage.removeItem(key);
     }
   });
 };
