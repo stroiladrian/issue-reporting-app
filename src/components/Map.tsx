@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Issue, Comment } from '../types';
@@ -55,8 +55,6 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
-        console.log('Image converted to base64, size:', Math.round(imageUrl.length / 1024), 'KB');
-        
         const newIssue = {
           latitude: clickedLocation.lat,
           longitude: clickedLocation.lng,
@@ -64,18 +62,14 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
           description: issueData.description,
           imageUrl,
         };
-        
-        console.log('Adding issue:', newIssue.title, 'at', newIssue.latitude, newIssue.longitude);
         onAddIssue(newIssue);
         setShowAddModal(false);
         setClickedLocation(null);
       };
       
       reader.onerror = (error) => {
-        console.error('Error reading image file:', error);
+        alert('Error reading image file. Please try again.');
       };
-      
-      console.log('Converting image to base64...', issueData.imageFile.name, issueData.imageFile.size, 'bytes');
       reader.readAsDataURL(issueData.imageFile);
     }
   };

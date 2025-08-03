@@ -23,9 +23,8 @@ function App() {
           })),
         }));
         setIssues(parsedIssues);
-        console.log('Loaded', parsedIssues.length, 'issues from localStorage');
       } catch (error) {
-        console.error('Error loading issues from localStorage:', error);
+        // Error loading from localStorage, start with empty array
       }
     }
     setIssuesLoaded(true);
@@ -35,7 +34,6 @@ function App() {
   useEffect(() => {
     if (issuesLoaded) {
       localStorage.setItem('issues', JSON.stringify(issues));
-      console.log('Saved', issues.length, 'issues to localStorage');
     }
   }, [issues, issuesLoaded]);
 
@@ -46,15 +44,7 @@ function App() {
       createdAt: new Date(),
       comments: [],
     };
-    console.log('handleAddIssue called with:', issueData.title);
-    console.log('Image URL length:', issueData.imageUrl.length);
-    console.log('New issue created with ID:', newIssue.id);
-    
-    setIssues(prev => {
-      const updated = [...prev, newIssue];
-      console.log('Issues array updated, new length:', updated.length);
-      return updated;
-    });
+    setIssues(prev => [...prev, newIssue]);
   };
 
   const handleAddComment = (issueId: string, commentData: Omit<Comment, 'id' | 'createdAt'>) => {
