@@ -55,16 +55,27 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
-        onAddIssue({
+        console.log('Image converted to base64, size:', Math.round(imageUrl.length / 1024), 'KB');
+        
+        const newIssue = {
           latitude: clickedLocation.lat,
           longitude: clickedLocation.lng,
           title: issueData.title,
           description: issueData.description,
           imageUrl,
-        });
+        };
+        
+        console.log('Adding issue:', newIssue.title, 'at', newIssue.latitude, newIssue.longitude);
+        onAddIssue(newIssue);
         setShowAddModal(false);
         setClickedLocation(null);
       };
+      
+      reader.onerror = (error) => {
+        console.error('Error reading image file:', error);
+      };
+      
+      console.log('Converting image to base64...', issueData.imageFile.name, issueData.imageFile.size, 'bytes');
       reader.readAsDataURL(issueData.imageFile);
     }
   };

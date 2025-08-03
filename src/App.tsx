@@ -7,27 +7,37 @@ import './App.css';
 function App() {
   const { location, error, loading } = useGeolocation();
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [issuesLoaded, setIssuesLoaded] = useState(false);
 
   // Load issues from localStorage on component mount
   useEffect(() => {
     const savedIssues = localStorage.getItem('issues');
     if (savedIssues) {
-      const parsedIssues = JSON.parse(savedIssues).map((issue: any) => ({
-        ...issue,
-        createdAt: new Date(issue.createdAt),
-        comments: issue.comments.map((comment: any) => ({
-          ...comment,
-          createdAt: new Date(comment.createdAt),
-        })),
-      }));
-      setIssues(parsedIssues);
+      try {
+        const parsedIssues = JSON.parse(savedIssues).map((issue: any) => ({
+          ...issue,
+          createdAt: new Date(issue.createdAt),
+          comments: issue.comments.map((comment: any) => ({
+            ...comment,
+            createdAt: new Date(comment.createdAt),
+          })),
+        }));
+        setIssues(parsedIssues);
+        console.log('Loaded', parsedIssues.length, 'issues from localStorage');
+      } catch (error) {
+        console.error('Error loading issues from localStorage:', error);
+      }
     }
+    setIssuesLoaded(true);
   }, []);
 
-  // Save issues to localStorage whenever issues change
+  // Save issues to localStorage whenever issues change (but only after initial load)
   useEffect(() => {
-    localStorage.setItem('issues', JSON.stringify(issues));
-  }, [issues]);
+    if (issuesLoaded) {
+      localStorage.setItem('issues', JSON.stringify(issues));
+      console.log('Saved', issues.length, 'issues to localStorage');
+    }
+  }, [issues, issuesLoaded]);
 
   const handleAddIssue = (issueData: Omit<Issue, 'id' | 'createdAt' | 'comments'>) => {
     const newIssue: Issue = {
@@ -36,7 +46,15 @@ function App() {
       createdAt: new Date(),
       comments: [],
     };
-    setIssues(prev => [...prev, newIssue]);
+    console.log('handleAddIssue called with:', issueData.title);
+    console.log('Image URL length:', issueData.imageUrl.length);
+    console.log('New issue created with ID:', newIssue.id);
+    
+    setIssues(prev => {
+      const updated = [...prev, newIssue];
+      console.log('Issues array updated, new length:', updated.length);
+      return updated;
+    });
   };
 
   const handleAddComment = (issueId: string, commentData: Omit<Comment, 'id' | 'createdAt'>) => {
