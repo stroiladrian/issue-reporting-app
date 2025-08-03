@@ -4,6 +4,14 @@ import L from 'leaflet';
 import { Issue, Comment } from '../types';
 import IssueModal from './IssueModal';
 import AddIssueModal from './AddIssueModal';
+import { 
+  checkRateLimit, 
+  validateImage, 
+  validateContent, 
+  validateLocation, 
+  checkForDuplicates,
+  cleanupRateLimitData 
+} from '../utils/security';
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -44,14 +52,42 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
     }
   }, [issues, selectedIssue]);
 
+  // Cleanup old rate limit data on component mount
+  React.useEffect(() => {
+    cleanupRateLimitData();
+  }, []);
+
   const handleMapClick = (lat: number, lng: number) => {
     setClickedLocation({ lat, lng });
     setShowAddModal(true);
   };
 
-  const handleAddIssue = (issueData: { title: string; description: string; imageFile: File }) => {
-    if (clickedLocation) {
-      // Convert image to base64 data URL for localStorage persistence
+  const handleAddIssue = async (issueData: { title: string; description: string; imageFile: File }) => {
+    if (!clickedLocation || !userLocation) return;
+
+    try {
+      // 1. Rate limiting check
+      checkRateLimit('issuesPerHour');
+      checkRateLimit('issuesPerDay');
+
+      // 2. Content validation
+      validateContent(issueData.title, issueData.description);
+
+      // 3. Check for duplicates
+      checkForDuplicates(issueData.title, issueData.description);
+
+      // 4. Validate location (within 1km of user)
+      validateLocation(
+        clickedLocation.lat,
+        clickedLocation.lng,
+        userLocation.latitude,
+        userLocation.longitude
+      );
+
+      // 5. Image validation
+      await validateImage(issueData.imageFile);
+
+      // All validations passed, proceed with creating the issue
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
@@ -67,10 +103,15 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
         setClickedLocation(null);
       };
       
-      reader.onerror = (error) => {
-        alert('Error reading image file. Please try again.');
+      reader.onerror = () => {
+        alert('Error processing image file. Please try again.');
       };
+      
       reader.readAsDataURL(issueData.imageFile);
+
+    } catch (error) {
+      // Show user-friendly error message
+      alert(error instanceof Error ? error.message : 'An error occurred while submitting your report.');
     }
   };
 

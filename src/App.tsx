@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Map from './components/Map';
+import SecurityInfo from './components/SecurityInfo';
 import { useGeolocation } from './hooks/useGeolocation';
 import { Issue, Comment } from './types';
+import { checkRateLimit } from './utils/security';
 import './App.css';
 
 function App() {
@@ -48,17 +50,41 @@ function App() {
   };
 
   const handleAddComment = (issueId: string, commentData: Omit<Comment, 'id' | 'createdAt'>) => {
-    const newComment: Comment = {
-      ...commentData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-    };
+    try {
+      // Rate limiting for comments
+      checkRateLimit('commentsPerHour');
 
-    setIssues(prev => prev.map(issue => 
-      issue.id === issueId 
-        ? { ...issue, comments: [...issue.comments, newComment] }
-        : issue
-    ));
+      // Basic content validation for comments
+      if (commentData.text.trim().length < 5) {
+        throw new Error('Comment must be at least 5 characters long.');
+      }
+
+      if (commentData.text.trim().length > 500) {
+        throw new Error('Comment too long. Please keep it under 500 characters.');
+      }
+
+      if (commentData.author.trim().length < 2) {
+        throw new Error('Name must be at least 2 characters long.');
+      }
+
+      if (commentData.author.trim().length > 50) {
+        throw new Error('Name too long. Please keep it under 50 characters.');
+      }
+
+      const newComment: Comment = {
+        ...commentData,
+        id: Date.now().toString(),
+        createdAt: new Date(),
+      };
+
+      setIssues(prev => prev.map(issue => 
+        issue.id === issueId 
+          ? { ...issue, comments: [...issue.comments, newComment] }
+          : issue
+      ));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'An error occurred while adding your comment.');
+    }
   };
 
   if (loading) {
@@ -86,6 +112,8 @@ function App() {
         <h1>Community Issue Reporter</h1>
         <p>Click anywhere on the map to report an issue in your community</p>
       </header>
+      
+      <SecurityInfo />
       
       <Map
         userLocation={location}
