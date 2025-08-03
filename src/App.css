@@ -460,12 +460,11 @@ body {
 /* Custom Pin Styles */
 .custom-pin, .user-pin {
   cursor: pointer;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
   transition: transform 0.2s ease;
 }
 
 .custom-pin:hover, .user-pin:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 .leaflet-div-icon {

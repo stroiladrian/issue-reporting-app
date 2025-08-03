@@ -54,60 +54,36 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
     }
   };
 
-  // Custom colored pin icon
+  // Issue marker icon - red color #800517
   const customIcon = new L.DivIcon({
     className: 'custom-pin',
     html: `<div style="
-      width: 0; 
-      height: 0; 
-      border-left: 12px solid transparent; 
-      border-right: 12px solid transparent; 
-      border-top: 20px solid #800517;
-      position: relative;
-      margin-left: -12px;
-      margin-top: -20px;
-    ">
-      <div style="
-        width: 12px; 
-        height: 12px; 
-        background-color: #800517; 
-        border-radius: 50%; 
-        position: absolute; 
-        top: -16px; 
-        left: -6px;
-      "></div>
-    </div>`,
-    iconSize: [24, 20],
-    iconAnchor: [12, 20],
-    popupAnchor: [0, -20],
+      width: 20px; 
+      height: 20px; 
+      background-color: #800517; 
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    "></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -15],
   });
 
-  // User location icon (different color to distinguish)
+  // User location icon - blue color to distinguish
   const userIcon = new L.DivIcon({
     className: 'user-pin',
     html: `<div style="
-      width: 0; 
-      height: 0; 
-      border-left: 12px solid transparent; 
-      border-right: 12px solid transparent; 
-      border-top: 20px solid #007bff;
-      position: relative;
-      margin-left: -12px;
-      margin-top: -20px;
-    ">
-      <div style="
-        width: 12px; 
-        height: 12px; 
-        background-color: #007bff; 
-        border-radius: 50%; 
-        position: absolute; 
-        top: -16px; 
-        left: -6px;
-      "></div>
-    </div>`,
-    iconSize: [24, 20],
-    iconAnchor: [12, 20],
-    popupAnchor: [0, -20],
+      width: 20px; 
+      height: 20px; 
+      background-color: #007bff; 
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    "></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -15],
   });
 
   if (!userLocation) {
