@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/issue-reporting-app/static/css/main.e96a73e6.css",
+    "main.js": "/issue-reporting-app/static/js/main.625c4bfd.js",
+    "index.html": "/issue-reporting-app/index.html",
+    "main.e96a73e6.css.map": "/issue-reporting-app/static/css/main.e96a73e6.css.map",
+    "main.625c4bfd.js.map": "/issue-reporting-app/static/js/main.625c4bfd.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e96a73e6.css",
+    "static/js/main.625c4bfd.js"
+  ]
+}
