@@ -20,6 +20,7 @@ const IssueModal: React.FC<IssueModalProps> = ({ issue, onClose, onAddComment })
         author: authorName.trim(),
       });
       setNewComment('');
+      setAuthorName('');
     }
   };
 
