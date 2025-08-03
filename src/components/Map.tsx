@@ -1,0 +1,134 @@
+import React, { useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import { Issue, Comment } from '../types';
+import IssueModal from './IssueModal';
+import AddIssueModal from './AddIssueModal';
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+interface MapProps {
+  userLocation: { latitude: number; longitude: number } | null;
+  issues: Issue[];
+  onAddIssue: (issue: Omit<Issue, 'id' | 'createdAt' | 'comments'>) => void;
+  onAddComment: (issueId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => void;
+}
+
+const MapEvents: React.FC<{ onMapClick: (lat: number, lng: number) => void }> = ({ onMapClick }) => {
+  useMapEvents({
+    click: (e) => {
+      onMapClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+};
+
+const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddComment }) => {
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  const handleMapClick = (lat: number, lng: number) => {
+    setClickedLocation({ lat, lng });
+    setShowAddModal(true);
+  };
+
+  const handleAddIssue = (issueData: { title: string; description: string; imageFile: File }) => {
+    if (clickedLocation) {
+      const imageUrl = URL.createObjectURL(issueData.imageFile);
+      onAddIssue({
+        latitude: clickedLocation.lat,
+        longitude: clickedLocation.lng,
+        title: issueData.title,
+        description: issueData.description,
+        imageUrl,
+      });
+      setShowAddModal(false);
+      setClickedLocation(null);
+    }
+  };
+
+  const customIcon = new L.Icon({
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+  if (!userLocation) {
+    return <div>Loading map...</div>;
+  }
+
+  return (
+    <div style={{ height: '100vh', width: '100%' }}>
+      <MapContainer
+        center={[userLocation.latitude, userLocation.longitude]}
+        zoom={16}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        
+        <MapEvents onMapClick={handleMapClick} />
+
+        {/* User location marker */}
+        <Marker
+          position={[userLocation.latitude, userLocation.longitude]}
+          icon={customIcon}
+        >
+          <Popup>Your Location</Popup>
+        </Marker>
+
+        {/* Issue markers */}
+        {issues.map((issue) => (
+          <Marker
+            key={issue.id}
+            position={[issue.latitude, issue.longitude]}
+            icon={customIcon}
+            eventHandlers={{
+              click: () => setSelectedIssue(issue),
+            }}
+          >
+            <Popup>
+              <div>
+                <h3>{issue.title}</h3>
+                <p>{issue.description.substring(0, 100)}...</p>
+                <button onClick={() => setSelectedIssue(issue)}>
+                  View Details
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+
+      {selectedIssue && (
+        <IssueModal
+          issue={selectedIssue}
+          onClose={() => setSelectedIssue(null)}
+          onAddComment={onAddComment}
+        />
+      )}
+
+      {showAddModal && clickedLocation && (
+        <AddIssueModal
+          onClose={() => {
+            setShowAddModal(false);
+            setClickedLocation(null);
+          }}
+          onSubmit={handleAddIssue}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Map;
