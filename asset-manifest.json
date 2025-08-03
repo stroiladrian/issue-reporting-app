@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/issue-reporting-app/static/css/main.2ecbd9c5.css",
+    "main.css": "/issue-reporting-app/static/css/main.15cccd58.css",
     "main.js": "/issue-reporting-app/static/js/main.b4aa869e.js",
     "index.html": "/issue-reporting-app/index.html",
-    "main.2ecbd9c5.css.map": "/issue-reporting-app/static/css/main.2ecbd9c5.css.map",
+    "main.15cccd58.css.map": "/issue-reporting-app/static/css/main.15cccd58.css.map",
     "main.b4aa869e.js.map": "/issue-reporting-app/static/js/main.b4aa869e.js.map"
   },
   "entrypoints": [
-    "static/css/main.2ecbd9c5.css",
+    "static/css/main.15cccd58.css",
     "static/js/main.b4aa869e.js"
   ]
 }
