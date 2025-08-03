@@ -54,11 +54,60 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
     }
   };
 
-  const customIcon = new L.Icon({
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
+  // Custom colored pin icon
+  const customIcon = new L.DivIcon({
+    className: 'custom-pin',
+    html: `<div style="
+      width: 0; 
+      height: 0; 
+      border-left: 12px solid transparent; 
+      border-right: 12px solid transparent; 
+      border-top: 20px solid #800517;
+      position: relative;
+      margin-left: -12px;
+      margin-top: -20px;
+    ">
+      <div style="
+        width: 12px; 
+        height: 12px; 
+        background-color: #800517; 
+        border-radius: 50%; 
+        position: absolute; 
+        top: -16px; 
+        left: -6px;
+      "></div>
+    </div>`,
+    iconSize: [24, 20],
+    iconAnchor: [12, 20],
+    popupAnchor: [0, -20],
+  });
+
+  // User location icon (different color to distinguish)
+  const userIcon = new L.DivIcon({
+    className: 'user-pin',
+    html: `<div style="
+      width: 0; 
+      height: 0; 
+      border-left: 12px solid transparent; 
+      border-right: 12px solid transparent; 
+      border-top: 20px solid #007bff;
+      position: relative;
+      margin-left: -12px;
+      margin-top: -20px;
+    ">
+      <div style="
+        width: 12px; 
+        height: 12px; 
+        background-color: #007bff; 
+        border-radius: 50%; 
+        position: absolute; 
+        top: -16px; 
+        left: -6px;
+      "></div>
+    </div>`,
+    iconSize: [24, 20],
+    iconAnchor: [12, 20],
+    popupAnchor: [0, -20],
   });
 
   if (!userLocation) {
@@ -82,7 +131,7 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
         {/* User location marker */}
         <Marker
           position={[userLocation.latitude, userLocation.longitude]}
-          icon={customIcon}
+          icon={userIcon}
         >
           <Popup>Your Location</Popup>
         </Marker>
