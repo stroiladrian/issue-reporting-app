@@ -34,6 +34,16 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
   const [showAddModal, setShowAddModal] = useState(false);
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  // Update selectedIssue when issues change (e.g., when a comment is added)
+  React.useEffect(() => {
+    if (selectedIssue) {
+      const updatedIssue = issues.find(issue => issue.id === selectedIssue.id);
+      if (updatedIssue) {
+        setSelectedIssue(updatedIssue);
+      }
+    }
+  }, [issues, selectedIssue]);
+
   const handleMapClick = (lat: number, lng: number) => {
     setClickedLocation({ lat, lng });
     setShowAddModal(true);
