@@ -51,16 +51,21 @@ const Map: React.FC<MapProps> = ({ userLocation, issues, onAddIssue, onAddCommen
 
   const handleAddIssue = (issueData: { title: string; description: string; imageFile: File }) => {
     if (clickedLocation) {
-      const imageUrl = URL.createObjectURL(issueData.imageFile);
-      onAddIssue({
-        latitude: clickedLocation.lat,
-        longitude: clickedLocation.lng,
-        title: issueData.title,
-        description: issueData.description,
-        imageUrl,
-      });
-      setShowAddModal(false);
-      setClickedLocation(null);
+      // Convert image to base64 data URL for localStorage persistence
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        onAddIssue({
+          latitude: clickedLocation.lat,
+          longitude: clickedLocation.lng,
+          title: issueData.title,
+          description: issueData.description,
+          imageUrl,
+        });
+        setShowAddModal(false);
+        setClickedLocation(null);
+      };
+      reader.readAsDataURL(issueData.imageFile);
     }
   };
 
